@@ -1,0 +1,172 @@
+
+
+
+### 1. Allgemeine Informationen zum Modul
+*   **Modul-Titel:** `[Vom LDR zum Fotometer]`
+*   **Modul-Untertitel:** `[Ein Lernmodul zur Sensorkalibrierung und quantitativen Messdatenauswertung]`
+*   **Logo für den Header:** `[NWTLOGO.png]` (Hinweis: Dateiname des Logos)
+*   **Logo für den Footer:** `[]` (Optional, kann leer bleiben)
+*   **Autoren/Entwickler:** `[John van Dijk]`
+*   **Lizenzhinweis:** `[Z.B. CC BY-SA 4.0 ]`
+
+### 2. Quellenangaben (Optional)
+(Listen Sie hier alle Quellen auf, die Sie im Modul verwenden.)
+*   `[Quelle 1, z.B. Autorenname, Jahr, Titel]`
+*   `[Quelle 2, z.B. Link zur Webseite]`
+*   `[Fügen Sie bei Bedarf weitere Punkte hinzu]`
+
+### 3. Designvorgaben (Optional)
+(Lassen Sie Felder leer, um die Standardwerte zu verwenden.)
+*   **Hauptfarbe:** `[#4CAF50]` (für Header, Icons, Buttons)
+*   **Sekundärfarbe:** `[#45a049]` (für Hover-Effekte)
+*   **Haupt-Schriftart (Google Font):** `[z.B. Lato]`
+*   **Titel-Schriftart (Google Font):** `[z.B. Montserrat]`
+
+
+### 4. interaktive Elemente
+
+1.1. Funktionsprinzip LDR
+
+Die Simulation soll den **inversen Zusammenhang** zwischen Lichtintensität und elektrischem Widerstand bei einem LDR (Fotowiderstand) visualisieren. Ein Benutzer soll einen Schieberegler bewegen und sofort sehen, wie sich der Widerstand ändert.
+HTML-Struktur
+Bitte erstelle exakt die folgende HTML-Struktur.
+```html
+<div class="ldr-simulation-container">
+    
+    <label for="light-slider-1-1">
+        <b>Lichtintensität</b> (0=Dunkel, 100=Hell)
+    </label>
+    <input 
+        type="range" 
+        id="light-slider-1-1" 
+        min="0" 
+        max="100" 
+        value="50"
+        style="width: 100%;">
+    
+    <div id="ohmmeter-display-1-1">
+        <span id="resistance-output-1-1">...</span>
+    </div>
+
+</div>
+
+#ohmmeter-display-1-1 {
+    background-color: #f4f4f4;
+    border: 2px solid #333;
+    border-radius: 5px;
+    padding: 15px;
+    margin-top: 15px;
+    text-align: center;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.5em; /* Macht die Zahl größer */
+    font-weight: bold;
+    color: #000;
+}
+
+/*
+ * Logik für die interaktive Simulation 1.1 (LDR-Funktionsprinzip)
+ */
+
+// Warten, bis das HTML-Dokument vollständig geladen ist
+document.addEventListener('DOMContentLoaded', () => {
+
+    // 1. DOM-Elemente holen
+    const slider = document.getElementById('light-slider-1-1');
+    const output = document.getElementById('resistance-output-1-1');
+
+    // 2. Physikalische Konstanten definieren
+    const MAX_RESISTANCE = 200000; // 200 kΩ
+    const MIN_RESISTANCE = 500;    // 500 Ω
+    const RESISTANCE_RANGE = MAX_RESISTANCE - MIN_RESISTANCE;
+
+    // 3. Update-Funktion
+    function updateResistance() {
+        // Aktuellen Slider-Wert holen (0 bis 100)
+        let lightValue = parseFloat(slider.value);
+        
+        // Den Wert in einen Prozentsatz umwandeln (0.0 bis 1.0)
+        let lightPercent = lightValue / 100;
+
+        // Den Widerstand berechnen (invers zum Licht)
+        // Bei 0% Licht -> MAX_RESISTANCE
+        // Bei 100% Licht -> MIN_RESISTANCE
+        let currentResistance = MAX_RESISTANCE - (lightPercent * RESISTANCE_RANGE);
+
+        // 4. Den Wert formatieren (für die Anzeige)
+        let displayValue = "";
+        if (currentResistance >= 1000) {
+            // In kΩ umrechnen, wenn es 1000 Ω oder mehr sind
+            displayValue = (currentResistance / 1000).toFixed(1) + " kΩ";
+        } else {
+            // Sonst in Ω anzeigen
+            displayValue = currentResistance.toFixed(0) + " Ω";
+        }
+
+        // 5. Den Wert im "Ohmmeter" anzeigen
+        output.textContent = displayValue;
+    }
+
+    // 6. Event Listener hinzufügen
+    // 'input' feuert jedes Mal, wenn der Slider bewegt wird
+    slider.addEventListener('input', updateResistance);
+
+    // 7. Initialen Wert beim Laden der Seite setzen
+    updateResistance();
+
+});
+
+ 1.2 Der Spannungsteiler 
+ 
+  "Erstelle eine interaktive Simulation eines Spannungsteilers mit einem LDR und einem festen Widerstand unter Verwendung von HTML, CSS und JavaScript."Die HTML-Struktur: "Erstelle einen HTML-Slider mit der ID light-slider (Werte 0-100) und ein Dropdown-Menü mit der ID resistor-select (Optionen für 1000, 10000, 100000 $\Omega$)."Die Annahmen: "Gehe von einer Eingangsspannung $V_{in}$ von 5 Volt aus."Das logische Mapping (Ganz wichtig!): "Der Wert des light-slider (0-100) soll den Widerstand des LDRs ($R_{LDR}$) steuern. Bilde diesen Wert nicht-linear (logarithmisch) oder linear ab.Für eine einfache lineare Abbildung (invers): Slider-Wert 0 (Dunkel) soll $R_{LDR} = 200.000$ $\Omega$ entsprechen. Slider-Wert 100 (Hell) soll $R_{LDR} = 500$ $\Omega$ entsprechen."Die Berechnungsformeln (Das Modell): "Wenn sich ein Wert ändert, berechne:$V_{out} = 5.0 \times \frac{R_{Fixed}}{R_{LDR} + R_{Fixed}}$$ADC_{Wert} = \frac{V_{out}}{5.0} \times 1023$ (oder die vereinfachte Formel)"Die Ausgabe: "Zeige den aktuell simulierten $R_{LDR}$, die $V_{out}$ (auf 2 Nachkommastellen gerundet) und den $ADC_{Wert}$ (als ganze Zahl) in den entsprechenden HTML-Span-Elementen an."
+
+
+### Teil B: Technische und gestalterische Anweisungen (Für die KI – Bitte nicht verändern!)
+
+**Rolle:** Du bist ein Experte für didaktisches Design und Webentwicklung mit Spezialisierung auf moderne, interaktive Lernanwendungen.
+
+**Ziel:** Erstelle ein einziges, vollständiges und sofort lauffähiges HTML-Dokument basierend auf den Inhalten aus Teil A. Das Ergebnis soll sich durch ein äußerst haptisches, modernes Design mit vielen flüssigen Interaktionen auszeichnen.
+
+**1. Grund-Setup:**
+*   **Einzel-Datei-Struktur:** Der gesamte HTML-, CSS- und JavaScript-Code muss in einer einzigen `.html`-Datei enthalten sein.
+*   **Abhängigkeiten (CDN):** Binde die folgenden Ressourcen im `<head>` ein:
+    *   MathJax: `https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js`
+    *   Font Awesome: `https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css`
+    *   **NEU** highlight.js (für Code): `https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css` und `https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js`
+    *   **NEU** p5.js (für Simulationen): `https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.2/p5.js`
+    *   **NEU** plotly.js (für Simulationen): `https://cdn.plot.ly/plotly-2.32.0.min.js`
+
+**2. Design & Layout (Visuelle Blaupause):**
+*   **CSS-Einbettung:** Implementiere den gesamten CSS-Code in einem `<style>`-Block im `<head>`. Verwende kein Bootstrap, sondern modernes, eigenes CSS mit Flexbox/Grid.
+*   **CSS-Variablen:** Definiere die folgenden Farb- und Layout-Variablen im `:root`-Selektor:
+    *   `--kit-primary-color: #00876C;`
+    *   `--kit-secondary-color: #005A4B;`
+    *   `--header-height: 80px;`
+    *   `--progressbar-height: 8px;`
+    *   `--correct-color: #28a745;`
+    *   `--incorrect-color: #dc3545;`
+    *   `--font-main: 'Roboto', sans-serif;`
+    *   `--font-title: 'Roboto', sans-serif;`
+*   **Google Fonts:** Importiere die Schriftart 'Roboto' (Stärken 300, 400, 500, 700). Falls in Teil A unter `3. Designvorgaben` andere Schriftarten angegeben sind, importiere diese **zusätzlich** und überschreibe die CSS-Variablen `--font-main` und `--font-title`.
+*   **Dynamisches Design:** **WICHTIG:** Wenn in Teil A unter `3. Designvorgaben` Farben angegeben sind, **überschreibe** die Standardwerte für `--kit-primary-color` und `--kit-secondary-color` mit den Werten des Nutzers.
+*   **Allgemeines Layout:** Implementiere ein klares, luftiges Layout mit viel Weißraum. Alle interaktiven Elemente müssen bei Hover und Klick deutliches visuelles Feedback geben (z.B. leichte Skalierung, Farbänderung, Schatten).
+*   **Fixierter Header & Fortschrittsbalken:** Erstelle einen oben fixierten Header (`.kit-header`) und einen direkt darunter liegenden Fortschrittsbalken (`.progress-container`), der sich beim Scrollen füllt.
+*   **Content Sections (`.content-section`):** Gestalte die Sektionen mit weißem Hintergrund, abgerundeten Ecken, leichtem Schatten und unterem Abstand.
+*   **Einblend-Animation:** Sektionen sind initial unsichtbar (`opacity: 0, transform: translateY(40px)`) und blenden beim Hineinscrollen weich ein (durch Hinzufügen der Klasse `.is-visible`).
+*   **Stile für Interaktionen:** Implementiere präzise CSS-Regeln für alle interaktiven Elemente und ihre Zustände (`.correct`, `.incorrect`, `.disabled`, `.dragging`, etc.).
+
+**3. JavaScript-Funktionalität (Interaktivität):**
+*   **Implementierung:** Schreibe die gesamte Logik in Vanilla JavaScript in einem einzigen `<script>`-Block am Ende des `<body>`.
+*   **Grundfunktionen:**
+    *   Fortschrittsbalken: Aktualisiere die Breite des Balkens beim Scrollen.
+    *   Section-Observer: Nutze `IntersectionObserver`, um die Klasse `.is-visible` zu den Sektionen hinzuzufügen, wenn sie in den Viewport kommen.
+*   **Logik für bestehende Blöcke:**
+    *   Quiz, Interaktive Tabelle, Rechenaufgabe, Drag & Drop: Implementiere die Logik exakt wie im Original-Prompt beschrieben.
+*   **Logik für NEUE Interaktive Blöcke:**
+    *   **Code-Anzeige:** Erstelle einen `<pre><code>`-Block mit der vom Nutzer angegebenen Sprachklasse (z.B. `<code class="language-cpp">`). Rufe am Ende des Haupt-Skripts `hljs.highlightAll();` auf, um die Syntax-Hervorhebung zu aktivieren. Integriere einen "Kopieren"-Button, der den Code-Inhalt in die Zwischenablage legt.
+    *   **Interaktive Simulation:** Erstelle einen Container `<div>` mit einer einzigartigen ID. Direkt **danach**, füge einen neuen `<script>`-Block ein. Innerhalb dieses Skript-Blocks, platziere den JavaScript-Code des Nutzers. Wenn `p5.js` gewählt wurde, instanziiere p5 im "instance mode", damit sich die Simulation an den Container bindet und nicht global agiert.
+    *   **Akkordeon:** Erstelle einen Button für den Titel und einen `div` für den Inhalt. Bei Klick auf den Button, füge eine Klasse `.is-open` zum Container hinzu. Animiere das Öffnen und Schließen flüssig über die `max-height`-Eigenschaft im CSS. Ändere das Icon von `fa-circle-plus` zu `fa-circle-minus`, wenn das Element geöffnet ist.
+    *   **Schritt-für-Schritt Anleitung:** Stelle die Schritte als geordnete Liste (`<ol>`) mit ansprechendem Styling für die Schritt-Nummern dar.
+    *   **Materialliste:** Stelle die Elemente als ungeordnete Liste (`<ul>`) dar, wobei jedes Listenelement ein passendes Icon (z.B. `fa-solid fa-check`) erhält.
+
+**Abschließende Anweisung an die KI:**
+Verarbeite die in Teil A bereitgestellten Inhalte und baue sie mithilfe der strikten technischen Vorgaben aus Teil B zu einem finalen HTML-Dokument zusammen. Falls in Teil A unter Punkt 2 Quellen angegeben wurden, erstelle daraus eine eigene Sektion mit dem Titel "Quellen und Referenzen" am Ende des Moduls, direkt vor dem Footer. Das Ergebnis muss ein professionelles, didaktisch wertvolles und sofort einsetzbares Lernmodul mit einem Fokus auf eine herausragende, interaktive und moderne Benutzererfahrung sein. Interpretiere die Vorgaben nicht neu, sondern setze sie exakt um.
