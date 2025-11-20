@@ -402,6 +402,17 @@
         <li><i class="fa-solid fa-download"></i> CH340-Treiber (falls benötigt): <a href="https://sparks.gogo.co.nz/ch340.html" target="_blank" rel="noopener">sparks.gogo.co.nz/ch340.html</a></li>
         <li><i class="fa-solid fa-bread-slice"></i> Breadboard verstehen: <a href="https://learn.sparkfun.com/tutorials/how-to-use-a-breadboard/all" target="_blank" rel="noopener">SparkFun Breadboard Guide</a></li>
       </ul>
+
+      <h3 style="margin-top:28px; margin-bottom:10px;">Benötigte Materialien</h3>
+      <ul class="material-list">
+        <li><i class="fa-solid fa-microchip"></i> Arduino Microcontroller (Uno / Nano etc.)</li>
+        <li><i class="fa-solid fa-bread-slice"></i> Breadboard</li>
+        <li><i class="fa-solid fa-grip-lines"></i> Jumper Kabel</li>
+        <li><i class="fa-regular fa-lightbulb"></i> LED (weiß)</li>
+        <li><i class="fa-solid fa-ruler-horizontal"></i> Widerstände</li>
+        <li><i class="fa-solid fa-wave-square"></i> LDR (Fotowiderstand)</li>
+        <li><i class="fa-regular fa-square"></i> Transparenter kleiner Flüssigkeitsbehälter</li>
+      </ul>
     </section>
     <!-- 1. Technische Grundlagen: LDR am Microcontroller -->
     <section class="content-section" id="grundlagen">
@@ -645,11 +656,13 @@
           <em>Fotometer: Probenbehälter in Rot zwischen LDR und LED</em>
         </figcaption>
       </figure>
-     
+     <p>
+      Für den Widerstand nach der LED wird 100 Ohm empfohlen. Der Festwiderstand des Spannungsteilers (R1) entscheidet über die Sensitivität des Sensors. Für eine große Spannweite der Messwerte in helleren Umgebungen sind kleinere Widerstände sinnvoll. Hier wurde 2k Ohm verwendet.
+      </p>
 
-    <h4>Der Funktions-Check (Arduino Code)</h4>
+    <h4>Test Arduino Code</h4>
     <p>
-        Um den Aufbau zu testen, benötigen wir einen einfachen Code ("Sketch"). Dieser schaltet die Lichtquelle dauerhaft ein 
+        Um den Aufbau zu testen, benötigen wir einen einfachen Code. Dieser schaltet die Lichtquelle dauerhaft ein 
         und sendet die gemessenen Helligkeitswerte an den Computer (Serieller Monitor).
     </p>
 
@@ -689,7 +702,7 @@ void loop() {
     </div>
 
     <p style="margin-top:15px;">
-        <strong>Test-Anleitung:</strong> Laden Sie diesen Code hoch und öffnen Sie den <em>Seriellen Monitor</em> (Lupe oben rechts). 
+        <strong>Test-Anleitung:</strong> Kopieren sie diesen Code in Arduino IDE. Passen Sie eventuell die Pin-Belegung im code an. Laden Sie diesen Code auf den Arduino (Upload) und öffnen Sie den <em>Seriellen Monitor</em> (Lupe oben rechts). 
         Halten Sie nun einen Gegenstand oder eine gefüllte Küvette zwischen LED und LDR. Der Zahlenwert muss sich deutlich verändern.
     </p>
 
@@ -712,93 +725,154 @@ void loop() {
       </ul>
     </section>
 
-    <section class="content-section" id="kalibrierung">
+    <section class="content-section" id="messwerterfassung">
       <div class="section-emoji">🧪</div>
       <h2>3. Messwerterfassung & Kalibrierung</h2>
-      <p>
-        <em>Hier wird die Brücke von einem abstrakten "Rohwert" zur quantitativen Messung geschlagen.</em>
+      <p class="lead">
+        Hier verwandeln wir den Arduino vom einfachen Stromkreis-Bauteil in ein echtes wissenschaftliches Messinstrument.
       </p>
 
       <article>
-        <h3>3.1. Der Rohwert ist nicht die Messgröße</h3>
-        <p>
-          Der Arduino liefert über den Befehl <code>analogRead()</code> lediglich einen Wert zwischen 
-          <strong>0 und 1023</strong>. Das ist technisch korrekt, aber physikalisch nutzlos. 
-          Ein Wert von "850" sagt nichts darüber aus, ob eine Milch fettarm ist oder wie viel Zucker in der Cola ist.
-        </p>
-        <div style="background-color: #f9f9f9; padding: 15px; border-left: 5px solid #d9534f; margin-bottom: 16px;">
-          <strong>Das Ziel:</strong> Wir müssen den Rohwert (0-1023) in eine verständliche Einheit umrechnen, 
-          z. B. <strong>Konzentration in %</strong>.
+        <h3>3.1. Das Problem: Der "dumme" Rohwert</h3>
+        <div style="display: flex; gap: 20px; align-items: center;">
+          <div style="flex: 1;">
+            <p>
+              Ihr Arduino liefert über <code>analogRead()</code> einen Wert zwischen <strong>0 und 1023</strong>. 
+              Das ist technisch korrekt, aber physikalisch nutzlos. Ein Wert von "850" sagt nichts darüber aus, 
+              ob die Milch fettarm ist oder wie viel Sirup im Wasser ist.
+            </p>
+        
+          </div>
+          
         </div>
-      </article>
-
-      <article>
-        <h3>3.2. Lösung: Die Kalibrierung (2-Punkt-Methode)</h3>
-        <p>
-          Um dem Sensor beizubringen, was er sieht, brauchen wir zwei bekannte Punkte (Referenzwerte).
-        </p>
-        <ul>
-          <li><strong>Punkt A (Hell):</strong> Klares Wasser in der Küvette. Der Sensor sieht viel Licht. 
-            <br><em>Beispielwert: 900 (entspricht 0% Verschmutzung/Sirup).</em></li>
-          <li><strong>Punkt B (Dunkel):</strong> Maximale Konzentration (z.B. purer Sirup/Milch). Der Sensor sieht wenig Licht. 
-            <br><em>Beispielwert: 300 (entspricht 100% Verschmutzung/Sirup).</em></li>
-        </ul>
-        <p>Alle Werte dazwischen können nun rechnerisch ermittelt werden.</p>
       </article>
 
       <hr>
 
       <article>
-        <h3>3.3. Methode A: Externe Auswertung (Der "Wissenschaftler")</h3>
+        <h3>3.2. Die Lösung: Die 2-Punkt-Kalibrierung</h3>
         <p>
-          Diese Methode eignet sich hervorragend für den Physik-Unterricht, um Messreihen aufzunehmen und grafisch auszuwerten[cite: 9, 64].
+          Damit der Sensor "versteht", was er sieht, müssen wir ihm die Grenzen der Realität beibringen. 
+          Wir benötigen zwei Referenzpunkte.
         </p>
-        <ol>
-          <li>Laden Sie den "Basis-Sketch" (siehe oben) auf den Arduino.</li>
-          <li>Öffnen Sie den <strong>Seriellen Monitor</strong>.</li>
-          <li>Messen Sie nacheinander verschiedene Verdünnungen (0%, 25%, 50%, 100%).</li>
-          <li>Notieren Sie die Rohwerte in einer Excel-Tabelle.</li>
-          <li>Erstellen Sie ein <strong>XY-Punkt-Diagramm</strong> (Kalibrierkurve).</li>
-        </ol>
-        <p><em>Vorteil: Die Schüler sehen Nicht-Linearitäten und Messfehler direkt.</em></p>
+        
+        <div style="display: flex; justify-content: space-around; background: #f4f4f4; padding: 15px; border-radius: 8px;">
+          <div style="text-align: center; width: 30%;">
+            <strong>Schritt 1: Hell</strong><br>
+            Klares Wasser messen.<br>
+            <em>Wert notieren (z.B. 200)</em><br>
+            entspricht <strong>0%</strong>
+          </div>
+          <div style="font-size: 2em;">&rarr;</div>
+          <div style="text-align: center; width: 30%;">
+            <strong>Schritt 2: Dunkel</strong><br>
+            Maximal trübe Lösung messen.<br>
+            <em>Wert notieren (z.B. 300)</em><br>
+            entspricht <strong>100%</strong>
+          </div>
+        </div>
       </article>
 
       <article>
-        <h3>3.4. Methode B: Interne Auswertung (Der "Intelligente Sensor")</h3>
+        <h3>3.3. Zwei Wege der Auswertung</h3>
         <p>
-          Hier programmieren wir die Mathematik direkt in den Controller. Das Ergebnis ist ein eigenständiges Messgerät, 
-          wie es für den "Neutralisationsautomat" [cite: 266] oder den "Milch-Fett-Sensor" [cite: 68] benötigt wird.
+          Je nach Unterrichtsziel können Sie nun zwei unterschiedliche didaktische Wege einschlagen.
         </p>
-        <p>Wir nutzen die Funktion <code>map()</code>, um den Bereich umzurechnen.</p>
-        <pre><code style="display:block; background:#eee; padding:10px;">
-// Beispiel-Code für den Loop
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+          
+          <div style="border: 1px solid #ccc; padding: 15px; border-radius: 5px;">
+            <h4 style="color: #2c3e50;">Weg A: Der "Wissenschaftler" (Excel)</h4>
+            <p>
+              <strong>Ziel:</strong> Datenerfassung und Analyse.
+            </p>
+            <p>Der Arduino sendet nur Rohwerte an den PC. Die Schüler erstellen in Excel eine <strong>Kalibrierkurve</strong>.</p>
+            <p><em>Vorteil: Schüler erkennen Messfehler und Nicht-Linearitäten sichtbar.</em></p>
+          </div>
+
+          <div style="border: 1px solid #ccc; padding: 15px; border-radius: 5px;">
+            <h4 style="color: #2c3e50;">Weg B: Der "Automat" (Map)</h4>
+            <p>
+              <strong>Ziel:</strong> Automatisierung.
+            </p>
+            <p>Der Arduino rechnet selbst. Das Gerät zeigt direkt "%" an.</p>
+            <p><em>Vorteil: Das Gerät arbeitet autonom ohne PC und könnte mit den Ergebnissen potentiell eine Pumpe betreiben (UE Neutralisationsautomat).</em></p>
+          </div>
+        </div>
+      </article>
+
+      <article>
+        <h3>3.4. Umsetzung von Weg B </h3>
+        <p>
+          Für Weg B nutzen wir den Befehl <code>map()</code>. Der map()-Befehl verteilt die gemessenen Rohwerte eines Sensors (z.B. \(200\) bis \(380\) proportional auf die angegebene Zielspanne (z.B. \(0\) bis \(100\)).
+        </p>
+
+        <div class="custom-code-block">
+          <button class="copy-btn" title="Code kopieren"><i class="fa fa-copy"></i></button>
+          <pre><code class="language-cpp">
+// --- KONFIGURATION (wie in Sektion 2) ---
+const int sensorPin = A3; // Der LDR hängt an A3
+const int ledPin = 3;     // Die LED hängt an Pin 3
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(ledPin, OUTPUT);
+  digitalWrite(ledPin, HIGH); // Licht an
+}
+
 void loop() {
-  int rohwert = analogRead(A0);
-  
-  // KALIBRIERUNG: Diese Werte müssen experimentell ermittelt werden!
-  // Wasser (hell) = 900 (vom Sensor abgelesen)
-  // Sirup (dunkel) = 300 (vom Sensor abgelesen)
-  
-  // Umrechnung: map(Wert, vonMin, vonMax, zuMin, zuMax)
-  // Achtung: Hoher Rohwert (900) = 0% Konzentration
-  // Niedriger Rohwert (300) = 100% Konzentration
-  
-  int konzentration = map(rohwert, 900, 300, 0, 100);
-  
-  // Begrenzung auf 0-100% (falls Messwerte schwanken)
+  // 1. MESSEN (Rohwert erfassen)
+  int rohwert = analogRead(sensorPin);
+
+  // 2. KALIBRIEREN (Hier tragen Sie Ihre gemessenen Grenzwerte ein)
+  // Beispiel: Wasser war hell (niedriger Wert), Sirup war dunkel (hoher Wert)
+  int wertHell = 200;   // Kalibrierwert für 0% Konzentration (Wasser)
+  int wertDunkel = 300; // Kalibrierwert für 100% Konzentration (Sirup)
+
+  // 3. UMRECHNEN (Mapping)
+  // map(Wert, vonMin, vonMax, zuMin, zuMax)
+  int konzentration = map(rohwert, wertHell, wertDunkel, 0, 100);
+
+  // 4. BEGRENZEN (Constrain)
+  // Falls es mal noch heller ist als "Hell", verhindert dies negative %-Werte.
   konzentration = constrain(konzentration, 0, 100);
 
-  Serial.print("Konzentration: ");
+  // 5. AUSGABE (Kombiniert für Kontrolle)
+  Serial.print("Rohwert: ");
+  Serial.print(rohwert);
+  Serial.print(" | Konzentration: ");
   Serial.print(konzentration);
   Serial.println(" %");
   
-  delay(500);
+  delay(500); 
 }
-        </code></pre>
-        <p>
-          <strong>Tipp für den Unterricht:</strong> Lassen Sie die Schüler erst die Werte 900 und 300 selbst herausfinden 
-          (Methodenkompetenz), bevor sie diese in den Code eintragen.
-        </p>
+          </code></pre>
+        </div>
+
+        <div style="display: flex; flex-direction: column; align-items: center; margin: 32px 0;">
+          <h4 style="text-align:center; color:#2c3e50; margin-bottom:18px;">Beispielmessungen: Experiment mit Waldmeistersirup und zugehöriger Serieller Monitor</h4>
+          <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 32px; margin-bottom: 24px;">
+            <div style="display: flex; flex-direction: column; align-items: center;">
+              <img src="Media/Images/Konz0.jpg" alt="Experiment: 0% Konzentration" style="max-width:220px; width:100%; border-radius:8px; box-shadow:0 2px 8px #0001;">
+              <span style="margin-top:8px; font-size:0.97em; color:#333;">Experiment: klares Wasser</span>
+              <img src="Media/Images/Serial0.png" alt="Serieller Monitor: 0% Konzentration" style="max-width:220px; width:100%; margin-top:10px; border-radius:8px; box-shadow:0 2px 8px #0001;">
+              <span style="margin-top:4px; font-size:0.97em; color:#333;">Serieller Monitor: 0% Konzentration</span>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+              <img src="Media/Images/Konz50.jpg" alt="Experiment: 50% Konzentration" style="max-width:220px; width:100%; border-radius:8px; box-shadow:0 2px 8px #0001;">
+              <span style="margin-top:8px; font-size:0.97em; color:#333;">Experiment: Verdünnte Mischung</span>
+              <img src="Media/Images/Serial50.png" alt="Serieller Monitor: 50% Konzentration" style="max-width:220px; width:100%; margin-top:10px; border-radius:8px; box-shadow:0 2px 8px #0001;">
+              <span style="margin-top:4px; font-size:0.97em; color:#333;">Serieller Monitor: &asymp; 50% Konzentration</span>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+              <img src="Media/Images/Konz100.jpg" alt="Experiment: 100% Konzentration" style="max-width:220px; width:100%; border-radius:8px; box-shadow:0 2px 8px #0001;">
+              <span style="margin-top:8px; font-size:0.97em; color:#333;">Experiment: Sirup </span>
+              <img src="Media/Images/Serial100.png" alt="Serieller Monitor: 100% Konzentration" style="max-width:220px; width:100%; margin-top:10px; border-radius:8px; box-shadow:0 2px 8px #0001;">
+              <span style="margin-top:4px; font-size:0.97em; color:#333;">Serieller Monitor: 100% Konzentration</span>
+            </div>
+          </div>
+        </div>
+
       </article>
     </section>
     <!-- ... weitere Sektionen wie Quiz, Code, Troubleshooting, etc. ... -->
