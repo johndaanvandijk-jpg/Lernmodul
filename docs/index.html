@@ -262,6 +262,13 @@
         padding: 10px 15px;
         border-radius: 6px;
     }
+    .data-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
     .data-display-adv p {
         margin: 12px 0;
         display: flex;
@@ -278,11 +285,95 @@
         font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
         font-size: 1.1em;
     }
+    /* Custom Code Block Styles */
+    .custom-code-block {
+      background: #e8f5e9;
+      color: #222;
+      border: 1.5px solid var(--kit-primary-color);
+      border-radius: 8px;
+      padding: 18px 18px 12px 18px;
+      margin: 18px 0;
+      position: relative;
+      font-family: 'Fira Mono', 'Consolas', 'Menlo', 'Monaco', monospace;
+      overflow-x: auto;
+    }
+    .custom-code-block pre {
+      margin: 0;
+      background: transparent;
+      color: inherit;
+      font-size: 1em;
+      overflow-x: auto;
+    }
+    .custom-code-block .copy-btn {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      background: var(--kit-primary-color);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 5px 10px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.2s;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .custom-code-block .copy-btn:hover, .custom-code-block .copy-btn:focus {
+      background: var(--kit-secondary-color);
+      color: #fff;
+    }
+    .custom-code-block .copy-btn.copied {
+      background: #388e3c;
+      color: #fff;
+    }
+    /* Tooltip Styles */
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      cursor: help;
+    }
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 320px;
+      background-color: #333;
+      color: #fff;
+      text-align: left;
+      border-radius: 8px;
+      padding: 12px;
+      position: absolute;
+      z-index: 10;
+      bottom: 110%;
+      left: 50%;
+      margin-left: -160px; /* Half of the width */
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      transform: translateY(10px);
+    }
+    .tooltip .tooltiptext h4 {
+        color: var(--kit-primary-color);
+        margin-top: 0;
+        margin-bottom: 8px;
+        font-size: 1.1rem;
+    }
+    .tooltip .tooltiptext p {
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin: 0;
+    }
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+      transform: translateY(0);
+    }
   </style>
 </head>
 <body>
   <header class="kit-header" role="banner" aria-label="Modultitel und Fortschrittsanzeige">
-    <img src="docs/Media/Images/NWTLOGO.png" alt="NWT Logo" />
+    <img src="Media/Images/NWTLOGO.png" alt="NWT Logo" />
     <div class="header-titles">
       <div class="title">Vom LDR zum Fotometer</div>
       <div class="subtitle">Ein Lernmodul zur Sensorkalibrierung und quantitativen Messdatenauswertung</div>
@@ -298,6 +389,9 @@
       <p class="lead">Ein Lernmodul zur Sensorkalibrierung und quantitativen Messdatenauswertung</p>
       <p><strong>Autor:</strong> John van Dijk</p>
       <p><strong>Lizenzhinweis:</strong> CC BY-SA 4.0</p>
+      <p>
+        Der Fokus dieser Webseite liegt auf der technischen Befähigung: Sie liefert das notwendige Know-how, um einen funktionierenden optischen Sensor zu bauen, diesen am Microcontroller zu betreiben und – entscheidend für den naturwissenschaftlichen Unterricht – die Rohdaten in nutzbare Messwerte zu übersetzen. Genau diese technische Kompetenz ist die Voraussetzung, um die <a href="https://lehrerfortbildung-bw.de/u_matnatech/nwt/gym/bp2016/fb5/7_ue9/2_foto/" target="_blank" rel="noopener">UE Fotometer</a> erfolgreich durchzuführen.
+      </p>
       <div class="quiz-block" style="background:#e8f5e9;">
         <i class="fa-solid fa-circle-info"></i>
         Dieses Modul richtet sich an Einsteiger*innen. Falls du ganz neu bist, folge bitte der Vorbereitung unten.
@@ -331,7 +425,7 @@
              background-color: #f4f4f4; /* Nur zur Demo */
                ">
        <div style="display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap;">
-        <img src="../Media/Images/LDRneu.jpeg" alt="Foto eines LDR" style="max-width: 300px; height: auto;border: 1px solid #ccc; padding: 5px;">
+        <img src="Media/Images/LDRneu.jpeg" alt="Foto eines LDR" style="max-width: 300px; height: auto;border: 1px solid #ccc; padding: 5px;">
         
           
           <svg viewBox="0 0 100 100" style="width: 300px; height: auto; border: 1px solid #ccc; padding: 5px;">
@@ -353,11 +447,24 @@
         <br>
         Im Fotometer wird der LDR mit einem festen Widerstand in Reihe geschaltet. Die Ausgangsspannung zwischen den beiden Widerständen hängt davon ab, wie hell es ist – und damit vom Widerstand des LDR.
         <br>
-        <b>Formel:</b> \( V_{out} = V_{in} \cdot \frac{R_{LDR}}{R1 + R_{LDR}} \)
+        <b>Formel (mit Herleitung beim Überfahren):</b>
+        <div class="tooltip" style="display: inline-block; border-bottom: 1px dotted #333; text-align: center;">
+            \( V_{out} = V_{in} \cdot \frac{R_{LDR}}{R1 + R_{LDR}} \)
+            <span class="tooltiptext">
+                <h4>Herleitung der Formel</h4>
+                <p>
+                    Die Formel basiert auf dem Ohmschen Gesetz \(U = R \cdot I\).
+                    <br>1. <strong>Gesamtwiderstand:</strong> \(R_{ges} = R1 + R_{LDR}\)
+                    <br>2. <strong>Gesamtstrom:</strong> \(I = \frac{V_{in}}{R_{ges}} = \frac{V_{in}}{R1 + R_{LDR}}\)
+                    <br>3. <strong>Spannung am LDR (\(V_{out}\)):</strong> \(V_{out} = R_{LDR} \cdot I\)
+                    <br>4. <strong>Einsetzen:</strong> \(V_{out} = R_{LDR} \cdot \frac{V_{in}}{R1 + R_{LDR}}\)
+                </p>
+            </span>
+        </div>
         <br>
         <b> So kann der Mikrocontroller die Helligkeit als Spannung messen!</b>
         <br>
-        Dies ist die häufigste Schaltung, bei der die Ausgangsspannung steigt, wenn es dunkler wird (hoher \( R_{\text{LDR}}\)).
+        
       </p>
       <div style="
               display: flex; 
@@ -370,23 +477,27 @@
              background-color: #f4f4f4; /* Nur zur Demo */
                ">
        <div style="display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap;">
-       <img src="..docs/Media/Images/LDR_schaltungneu.png" 
+       <img src="Media/Images/Spannungsteiler.png" 
          
          style="max-width: 100%; height: auto;">
           </div>
         </div>
-          <p> Dies ist die häufigste Schaltung, bei der die Ausgangsspannung steigt, wenn es dunkler wird (hoher \( R_{\text{LDR}}\)).</p>
 
-
+         <figure style="border: 1px solid #ccc; padding: 10px; text-align: center; background: #f9f9f9;">
+        <figcaption>
+          <em>Dies ist die häufigste Schaltung, bei der die Ausgangsspannung steigt, wenn es dunkler wird</em>
+        </figcaption>
+      </figure>
     
       <h3 style="margin-top:32px;">1.3. Simulation</h3>
       <div class="ldr-simulator-container-adv">
           <h3>⚡ Interaktive LDR-Schaltung (Spannungsteiler)</h3>
-          <p>Experimentieren Sie mit der Lichtstärke (Input) und dem Festwiderstand (R1),
-              um zu sehen, wie sich Spannung und ADC-Wert (Output) verändern.</p>
+          <p>Experimentieren Sie mit der Lichtstärke und dem Festwiderstand (R1),
+              um zu sehen, wie sich Spannung und ADC-Wert verändern. Optimiere die Sensitivität
+            des Lichtsensors mit verschiedenen R1-Werten.</p>
       
           <div class="slider-group">
-              <label for="light-slider-adv"><strong>Lichtintensität</strong> (Input)</label>
+              <label for="light-slider-adv"><strong>Lichtintensität</strong></label>
               <div class="slider-wrapper">
                   <span>🌙 Dunkel</span>
                   <input type="range" id="light-slider-adv" min="0" max="100" value="0">
@@ -398,28 +509,35 @@
               <label for="fixed-resistor-slider"><strong>Festwiderstand (R1)</strong></label>
               <div class="slider-wrapper">
                   <span>1 kΩ</span>
-                  <input type="range" id="fixed-resistor-slider" min="1" max="50" value="10">
-                  <span>50 kΩ</span>
+                  <input type="range" id="fixed-resistor-slider" min="1" max="200" value="10">
+                  <span>200 kΩ</span>
               </div>
               <div classid="r1-value-display">Aktuell R1: <strong id="fixed-res-display">...</strong></div>
           </div>
       
           <div class="data-display-adv">
-              <h4>Simulierte Messwerte:</h4>
-              <p>\(R_{LDR}\) = <strong id="ldr-res-display">...</strong></p>
-              <hr>
-              <p>\(V_{out}\) = <strong id="output-volt-display">...</strong></p>
-              <hr>
-              <p>ADC-Wert ( von 0-1023) = <strong id="adc-value-display">...</strong></p>
-          </div>
+    <h4>Simulierte Messwerte:</h4>
+    
+    <div class="data-row">
+        <span class="label"><i>R</i><sub>LDR</sub></span>
+        <span class="equals">=</span>
+        <span class="value"><strong id="ldr-res-display">...</strong> </span>
+    </div>
 
-          <div class="circuit-info-adv">
-           <strong>Formel:(Spannungsteiler bei \(V_{in}=5V\) ):</strong>
-          <p>
-           $$V_{out} = V_{in} \cdot \frac{R_{LDR}}{R1 + R_{LDR}}$$
-         </p>
+    <div class="data-row">
+        <span class="label"><i>V</i><sub>out</sub></span>
+        <span class="equals">=</span>
+        <span class="value"><strong id="output-volt-display">...</strong> </span>
+    </div>
 
-         </div>
+    <div class="data-row">
+        <span class="label">ADC (0-1023)</span>
+        <span class="equals">=</span>
+        <span class="value"><strong id="adc-value-display">...</strong></span>
+    </div>
+</div>
+          
+
       
       <script>
           document.addEventListener('DOMContentLoaded', function() {
@@ -491,6 +609,198 @@
           });
       </script>
     </section>
+
+    <section class="content-section" id="aufbau">
+      <div class="section-emoji">🧰</div>
+      <h2>2. Der Messaufbau</h2>
+      <p>
+        Nachdem die elektronischen Grundlagen (LDR und Spannungsteiler) geklärt sind, folgt der Aufbau des Fotometers. 
+        Für die Demonstration des Messprinzips genügt eine stark reduzierte, <strong>modellhafte Anordnung</strong> von nur drei Komponenten. 
+        Wir erweitern dafür einfach den Aufbau aus Teil 1 um eine LED. Die Optimierung dieses Aufbaus wird später zum Gegenstand der Unterrichtseinheit.
+      </p>
+
+
+       <div style="
+              display: flex; 
+              justify-content: center; /* Zentriert horizontal */
+              align-items: center;     /* Zentriert vertikal */
+             width: 100%; 
+              min-height: 50vh;         /* Sorgt dafür, dass der Wrapper die ganze Bildschirmhöhe einnimmt */
+              padding: 24px; 
+              box-sizing: border-box;  /* Stellt sicher, dass Padding die Höhe/Breite nicht sprengt */
+             background-color: #f4f4f4; /* Nur zur Demo */
+               ">
+       <div style="display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap;">
+       <img src="Media/Images/Fotometer.png" 
+         
+         style="max-width: 70%; height: auto;">
+          </div>
+        </div>
+
+
+
+
+      <figure style="border: 1px solid #ccc; padding: 10px; text-align: center; background: #f9f9f9;">
+        <figcaption>
+          <em>Fotometer: Probenbehälter in Rot zwischen LDR und LED</em>
+        </figcaption>
+      </figure>
+     
+
+    <h4>Der Funktions-Check (Arduino Code)</h4>
+    <p>
+        Um den Aufbau zu testen, benötigen wir einen einfachen Code ("Sketch"). Dieser schaltet die Lichtquelle dauerhaft ein 
+        und sendet die gemessenen Helligkeitswerte an den Computer (Serieller Monitor).
+    </p>
+
+    <div class="custom-code-block">
+      <button class="copy-btn" title="Code kopieren"><i class="fa fa-copy"></i></button>
+      <pre><code class="language-cpp">
+/*
+  Einfacher Fotometer-Test
+  Zweck: LED einschalten und LDR-Werte im Seriellen Monitor anzeigen.
+*/
+
+// Pins definieren
+const int sensorPin = A3; // Der LDR (Spannungsteiler) hängt an A0
+const int ledPin = 3;     // Die LED (mit Vorwiderstand) hängt an Pin 3
+
+void setup() {
+  // 1. Serielle Kommunikation für die Datenübertragung zum PC starten
+  Serial.begin(9600);
+  
+  // 2. LED konfigurieren und einschalten
+  pinMode(ledPin, OUTPUT);
+  digitalWrite(ledPin, HIGH); // Dauerlicht an für konstante Messung
+}
+
+void loop() {
+  // 3. Den aktuellen Wert vom Sensor lesen (Bereich 0 bis 1023)
+  int rohwert = analogRead(sensorPin);
+  
+  // 4. Wert zur Kontrolle an den PC senden
+  Serial.print("Aktueller Lichtwert: ");
+  Serial.println(rohwert);
+  
+  // 5. Kurze Pause, damit die Zahlen lesbar bleiben
+  delay(500); 
+}
+      </code></pre>
+    </div>
+
+    <p style="margin-top:15px;">
+        <strong>Test-Anleitung:</strong> Laden Sie diesen Code hoch und öffnen Sie den <em>Seriellen Monitor</em> (Lupe oben rechts). 
+        Halten Sie nun einen Gegenstand oder eine gefüllte Küvette zwischen LED und LDR. Der Zahlenwert muss sich deutlich verändern.
+    </p>
+
+    <hr>
+      <p style="margin-top: 15px;">
+        Das Prinzip der <strong>Transmissionsmessung</strong> ist einfach: Je weniger Licht am LDR ankommt (durch Absorption oder Streuung), 
+        desto höher ist die Konzentration der untersuchten Substanz (z.B. Fett im Milchtest oder Farbstoff im Cola-Test).
+      </p>
+      <hr>
+      <h3>Ansätze zur späteren Optimierung</h3>
+      <ul>
+        <li><strong>Fremdlicht (Störfaktor):</strong> Schon das Umgebungslicht verfälscht die Messung massiv.
+          <em>Optimierung:</em> Bau eines <strong>lichtdichten Gehäuses</strong> (z.B. aus schwarz lackiertem Holz oder Karton).</li>
+        <li><strong>Geometrische Stabilität:</strong> Geringfügige Bewegungen von LED oder LDR führen zu Schwankungen im Rohwert.
+          <em>Optimierung:</em> <strong>Feste Montage</strong> der Komponenten und Einhaltung eines konstanten Abstands.</li>
+        <li><strong>Lichtbündelung:</strong> Die LED strahlt diffus ab, was die Messgenauigkeit mindert.
+          <em>Optimierung:</em> Einsatz von <strong>Lochblenden</strong> oder lichtdichten Trennwänden, um den Strahl zu fokussieren.</li>
+        <li><strong>Wellenlänge (Farbe):</strong> Die gewählte LED-Farbe muss zur Probe passen.
+          <em>Optimierung:</em> Auswahl der optimalen LED-Farbe für die spezifische Messung (z.B. rote LED für blaue Flüssigkeiten).</li>
+      </ul>
+    </section>
+
+    <section class="content-section" id="kalibrierung">
+      <div class="section-emoji">🧪</div>
+      <h2>3. Messwerterfassung & Kalibrierung</h2>
+      <p>
+        <em>Hier wird die Brücke von einem abstrakten "Rohwert" zur quantitativen Messung geschlagen.</em>
+      </p>
+
+      <article>
+        <h3>3.1. Der Rohwert ist nicht die Messgröße</h3>
+        <p>
+          Der Arduino liefert über den Befehl <code>analogRead()</code> lediglich einen Wert zwischen 
+          <strong>0 und 1023</strong>. Das ist technisch korrekt, aber physikalisch nutzlos. 
+          Ein Wert von "850" sagt nichts darüber aus, ob eine Milch fettarm ist oder wie viel Zucker in der Cola ist.
+        </p>
+        <div style="background-color: #f9f9f9; padding: 15px; border-left: 5px solid #d9534f; margin-bottom: 16px;">
+          <strong>Das Ziel:</strong> Wir müssen den Rohwert (0-1023) in eine verständliche Einheit umrechnen, 
+          z. B. <strong>Konzentration in %</strong>.
+        </div>
+      </article>
+
+      <article>
+        <h3>3.2. Lösung: Die Kalibrierung (2-Punkt-Methode)</h3>
+        <p>
+          Um dem Sensor beizubringen, was er sieht, brauchen wir zwei bekannte Punkte (Referenzwerte).
+        </p>
+        <ul>
+          <li><strong>Punkt A (Hell):</strong> Klares Wasser in der Küvette. Der Sensor sieht viel Licht. 
+            <br><em>Beispielwert: 900 (entspricht 0% Verschmutzung/Sirup).</em></li>
+          <li><strong>Punkt B (Dunkel):</strong> Maximale Konzentration (z.B. purer Sirup/Milch). Der Sensor sieht wenig Licht. 
+            <br><em>Beispielwert: 300 (entspricht 100% Verschmutzung/Sirup).</em></li>
+        </ul>
+        <p>Alle Werte dazwischen können nun rechnerisch ermittelt werden.</p>
+      </article>
+
+      <hr>
+
+      <article>
+        <h3>3.3. Methode A: Externe Auswertung (Der "Wissenschaftler")</h3>
+        <p>
+          Diese Methode eignet sich hervorragend für den Physik-Unterricht, um Messreihen aufzunehmen und grafisch auszuwerten[cite: 9, 64].
+        </p>
+        <ol>
+          <li>Laden Sie den "Basis-Sketch" (siehe oben) auf den Arduino.</li>
+          <li>Öffnen Sie den <strong>Seriellen Monitor</strong>.</li>
+          <li>Messen Sie nacheinander verschiedene Verdünnungen (0%, 25%, 50%, 100%).</li>
+          <li>Notieren Sie die Rohwerte in einer Excel-Tabelle.</li>
+          <li>Erstellen Sie ein <strong>XY-Punkt-Diagramm</strong> (Kalibrierkurve).</li>
+        </ol>
+        <p><em>Vorteil: Die Schüler sehen Nicht-Linearitäten und Messfehler direkt.</em></p>
+      </article>
+
+      <article>
+        <h3>3.4. Methode B: Interne Auswertung (Der "Intelligente Sensor")</h3>
+        <p>
+          Hier programmieren wir die Mathematik direkt in den Controller. Das Ergebnis ist ein eigenständiges Messgerät, 
+          wie es für den "Neutralisationsautomat" [cite: 266] oder den "Milch-Fett-Sensor" [cite: 68] benötigt wird.
+        </p>
+        <p>Wir nutzen die Funktion <code>map()</code>, um den Bereich umzurechnen.</p>
+        <pre><code style="display:block; background:#eee; padding:10px;">
+// Beispiel-Code für den Loop
+void loop() {
+  int rohwert = analogRead(A0);
+  
+  // KALIBRIERUNG: Diese Werte müssen experimentell ermittelt werden!
+  // Wasser (hell) = 900 (vom Sensor abgelesen)
+  // Sirup (dunkel) = 300 (vom Sensor abgelesen)
+  
+  // Umrechnung: map(Wert, vonMin, vonMax, zuMin, zuMax)
+  // Achtung: Hoher Rohwert (900) = 0% Konzentration
+  // Niedriger Rohwert (300) = 100% Konzentration
+  
+  int konzentration = map(rohwert, 900, 300, 0, 100);
+  
+  // Begrenzung auf 0-100% (falls Messwerte schwanken)
+  konzentration = constrain(konzentration, 0, 100);
+
+  Serial.print("Konzentration: ");
+  Serial.print(konzentration);
+  Serial.println(" %");
+  
+  delay(500);
+}
+        </code></pre>
+        <p>
+          <strong>Tipp für den Unterricht:</strong> Lassen Sie die Schüler erst die Werte 900 und 300 selbst herausfinden 
+          (Methodenkompetenz), bevor sie diese in den Code eintragen.
+        </p>
+      </article>
+    </section>
     <!-- ... weitere Sektionen wie Quiz, Code, Troubleshooting, etc. ... -->
   </main>
   <footer>
@@ -517,8 +827,28 @@
     // highlight.js
     hljs.highlightAll();
   </script>
+  <script>
+    // Copy-to-Clipboard for custom code blocks
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.custom-code-block .copy-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          const code = btn.parentElement.querySelector('pre code');
+          if (!code) return;
+          // Remove leading/trailing whitespace and dedent
+          let text = code.innerText.replace(/^\s*\n/, '').replace(/\s*$/, '');
+          // Copy to clipboard
+          navigator.clipboard.writeText(text).then(function() {
+            btn.classList.add('copied');
+            btn.innerHTML = '<i class="fa fa-check"></i> Kopiert!';
+            setTimeout(function() {
+              btn.classList.remove('copied');
+              btn.innerHTML = '<i class="fa fa-copy"></i>';
+            }, 1200);
+          });
+        });
+      });
+    });
+  </script>
 
 </body>
 </html>
-
-
